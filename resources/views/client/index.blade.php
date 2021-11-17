@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-<table style="table table-stripped">
+<table class="table table-striped">
     <tr>
         <th>ID</th>
         <th>Name</th>

@@ -38,26 +38,33 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
+        $companyNew = $request->companyNew; // 1 arba false
+        // jeigu companyNew == 1(pazymetas) vykdomas naujos kompanijos pridejimas
+        // kitu atveju kompanija yra imama is select
 
-        $company = new Company;
-        $company->title = "Kompanija prideta per clients forma"; //$request->companyTitle;
-        $company->description = "Kompanijos aprasymas pridetas per clients forma"; //$request->companyDescription;
-        $company->address = "Kompanijos adresas priedetas per clients forma";//$request->companyAddress;
-        $company->save();
+        // return $companyNew;
 
-        //$company->id
+        if($companyNew == "1") { // koks kintamojo tipas ateina is checkbox jei jis pazymetas? 1 tekstas
+            $company = new Company;
+            $company->title =  $request->companyTitle;
+            $company->description = $request->companyDescription;
+            $company->address = $request->companyAddress;
+            $company->save();
+
+            $companyId = $company->id;
+        } else {
+            $companyId = $request->clientCompany;
+        }
 
 
+        $client = new Client;
 
+        $client->name = $request->clientName;
+        $client->surname = $request->clientSurname;
+        $client->description = $request->clientDescription;
+        $client->company_id = $companyId;
 
-        // $client = new Client;
-
-        // $client->name = $request->clientName;
-        // $client->surname = $request->clientSurname;
-        // $client->description = $request->clientDescription;
-        // $client->company_id = $company->id; nuo ifo $request->clientCompany, else $company
-
-        // $client->save;
+        $client->save();
 
         return redirect()->route('client.index');
     }
