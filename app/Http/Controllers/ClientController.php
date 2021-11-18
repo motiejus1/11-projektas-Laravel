@@ -111,6 +111,35 @@ class ClientController extends Controller
      */
     public function destroy(Client $client)
     {
-        //
+        $client->delete();
+        return redirect()->route("client.index");
+    }
+
+    public function destroyAjax(Client $client)
+    {
+        //1. IStriname klienta
+        //2. Suskaiciuojame kiek klientu liko kompanijai
+        //3. Likusiu klientu kieki perduodame i JSON zinute
+        //4. Per Javascript, jei klientu kiekis ateina 0, remove() - table, append() - alert
+        // id
+        //name
+        //surname
+        //company_id
+
+        $company_id = $client->company_id;
+
+        $client->delete();
+
+        $clientsLeft = Client::where('company_id', $company_id)->get() ;//masyvas su visais klientais, priklausanciais kompanijai
+        $clientsCount = $clientsLeft->count();
+
+        //sekmes nesekmes zinute
+        $success = [
+            "success" => "The Client deleted successfuly",
+            "clientsCount" => $clientsCount
+        ];
+        $success_json = response()->json($success);
+
+        return $success_json;
     }
 }

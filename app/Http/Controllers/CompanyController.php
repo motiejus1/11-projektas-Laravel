@@ -81,9 +81,11 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        $clients = $company->companyClients;
+        $clients = $company->companyClients; //masyvas su visais klientais priklausanciais kompanijai
+        $clientsCount = $clients->count();
         //visi klientai priklausantys kompanijai
-        return view("company.show",['company' => $company, 'clients'=>$clients]);
+
+        return view("company.show",['company' => $company, 'clients'=>$clients, 'clientsCount'=> $clientsCount]);
     }
 
     /**
