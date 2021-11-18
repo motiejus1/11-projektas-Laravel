@@ -105,20 +105,24 @@
             <div class="form-group row">
                 <label for="clientName" class="col-md-4 col-form-label text-md-right">{{ __('Name') }}</label>
 
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <input type="text" class="form-control" name="clientName[]">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="clientSurname" class="col-md-4 col-form-label text-md-right">{{ __('Surname') }}</label>
 
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <input type="text" class="form-control" name="clientSurname[]">
+                </div>
+
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger removeClient">Remove Client</button>
                 </div>
             </div>
             <div class="form-group row">
                 <label for="clientDescription" class="col-md-4 col-form-label text-md-right">{{ __('Description') }}</label>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <textarea name="clientDescription[]" class="summernote form-control">
                     </textarea>
                 </div>
@@ -138,12 +142,23 @@
             //prie clients-info div turi prikabinti nauja div client
             // $(".clients-info").append("<div class='client'>Div added</div>");
 
-            
+
             $(".clients-info").append($(".client-template").html());
 
             // console.log($(".client-template").html());
 
         })
+
+
+        //n+1
+        // 1
+        // 1
+        // 1 x
+
+        $(document).on("click", ".removeClient", function() {
+            console.log("veikia");
+            $(this).parents('.client').remove();
+        });
     });
 </script>
 
