@@ -151,7 +151,7 @@ class CompanyController extends Controller
         //1. Kai trinama kompanija, kartu isitrina ir visi jos klientai
 
         // 1. Surasti visus kompanijai priklausancius klientus pagal rysio funkcija, ir istrinti
-        // 2. pakeisti rysi
+        // 2. pakeisti rysio nustatymus
 
         //tas rysys registruojasi i duomenu baze, ir rysys turi tam tikrus nustatymus
         //migracijoje viena nustatyma ir mums leisti istrinti
@@ -176,11 +176,11 @@ class CompanyController extends Controller
             // $company = Company::where("id", $companyId);
             $company = Company::find($companyId);
             $clients_count = $company->companyClients->count();
-            if($clients_count > 0) {
-               $errorsuccess[] = 'danger';
-               $messages[] = "Company ".$companyId."cannot be deleted because it has clients";
+            // if($clients_count > 0) {
+            //    $errorsuccess[] = 'danger';
+            //    $messages[] = "Company ".$companyId."cannot be deleted because it has clients";
 
-            } else {
+            // } else {
                 $deleteAction = $company->delete();
                 if($deleteAction) {
                     $errorsuccess[] = 'success';
@@ -189,7 +189,7 @@ class CompanyController extends Controller
                     $messages[] = "Something went wrong";
                     $errorsuccess[] = 'danger';
                 }
-            }
+            // }
         }
 
 
