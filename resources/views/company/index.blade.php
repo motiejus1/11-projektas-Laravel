@@ -7,7 +7,9 @@
 
 
 --}}
+<div class="alerts d-none">
 
+</div>
 <table class="table table-striped">
     <tr>
         <th>ID</th>
@@ -20,7 +22,7 @@
     </tr>
 
     @foreach ($companies as $company)
-        <tr>
+        <tr class="company{{$company->id}}">
             <td>{{$company->id}}</td>
             <td>{{$company->title}}</td>
             <td>{{$company->description}}</td>
@@ -35,14 +37,20 @@
     @endforeach
 </table>
 {{-- Isves id pazymetu elementu --}}
-<button class="btn btn-primary" id="show-checked">Show Checked</button>
+<button class="btn btn-primary" id="delete-selected">Delete</button>
 <script>
     // I console mums isvestu informacija kuris checkbox buvo paspaustas
     // Delete mygtuka, prie kurios kompanijos buvo paspaustas delete
 
+    $.ajaxSetup({
+        headers: {
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
     $(document).ready(function() {
 
-            $("#show-checked").click(function() {
+            $("#delete-selected").click(function() {
                 //pasirinkciau visus delete-company elementus, kurie turi atributa checked
                 //visus dele-company kurie yra pazymeti
 
@@ -59,10 +67,36 @@
                     checkedCompanies[key] = company.value;
                 });
 
+                //javascript masyvas => JSON masyvas
                 console.log(checkedCompanies);
-                // console.log(checkedElValues);
 
-                // console.log($(".delete-company:checked"));
+
+                // [1,7,3]
+                // 3 kartus
+                // checkedCompanies[0] = 1
+                // checkedCompanies[1] = 7
+                //ckechedCompanies[2] = 3
+
+
+                $.ajax({
+                type: 'POST',
+                url: '{{route("company.destroySelected")}}',
+                data: { checkedCompanies: checkedCompanies }, //JSON masyva
+                success: function(data) {
+                        $(".alerts").toggleClass("d-none");
+                        for(var i=0; i<data.messages.length; i++) {
+                            $(".alerts").append("<div class='alert alert-"+data.errorsuccess[i] + "'><p>"+ data.messages[i] + "</p></div>")
+
+                            //danger arba success
+                            var id = data.success[i];
+                            if(data.errorsuccess[i] == "success") {
+                                $(".company"+id ).remove();
+                            }
+                        }
+
+                        // console.log(data.messages);
+                    }
+                });
             })
 
         $(".delete-company").click(function(){

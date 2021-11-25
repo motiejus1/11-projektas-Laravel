@@ -43,5 +43,6 @@ Route::prefix('companies')->group(function () {
     Route::post('update/{company}', 'CompanyController@update')->name('company.update');
     Route::post('delete/{company}', 'CompanyController@destroy' )->name('company.destroy');
     Route::get('show/{company}', 'CompanyController@show')->name('company.show');
+    Route::post('destroySelected', 'CompanyController@destroySelected')->name('company.destroySelected');
 
 });
