@@ -16,7 +16,8 @@ class ClientController extends Controller
     public function index()
     {
         $clients = Client::all();
-        return view('client.index',['clients'=> $clients]);
+        $companies = Company::all();
+        return view('client.index',['clients'=> $clients, 'companies'=> $companies]);
     }
 
     /**
@@ -69,6 +70,30 @@ class ClientController extends Controller
         return redirect()->route('client.index');
     }
 
+    public function storeAjax(Request $request) {
+        $client = new Client;
+
+        $client->name = $request->clientName;
+        $client->surname = $request->clientSurname;
+        $client->description = $request->clientDescription;
+        $client->company_id = $request->clientCompany;
+
+        $client->save();
+
+        $success = [
+            'success' => 'Client added successfully',
+            'clientId' => $client->id,
+            'clientName' => $client->name,
+            'clientSurname' => $client->surname,
+            'clientDescription' => $client->description,
+            'clientCompany' => $client->clientCompany->title
+        ];
+
+        $success_json = response()->json($success);
+
+        return $success_json;
+
+    }
     /**
      * Display the specified resource.
      *
