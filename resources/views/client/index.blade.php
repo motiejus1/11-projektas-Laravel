@@ -6,7 +6,7 @@
 
 2. Kliento redagavimo forma isokanciame lange
 
-3. Show funkcionalumas isokanciame lange
+3. Show funkcionalumas isokanciame lange x
 --}}
 <div class="container">
 
@@ -40,6 +40,8 @@
             <td>{{$client->clientCompany->title}}</td>
             <td>
                 <button type="button" class="btn btn-success show-client" data-clientid='{{$client->id}}'>Show</button>
+                <button type="button" class="btn btn-secondary update-client" data-clientid='{{$client->id}}'>Update</button>
+
             </td>
         </tr>
     @endforeach
@@ -128,6 +130,70 @@
     </div>
 </div>
 
+<div class="modal fade" id="editClientModal" tabindex="-1" role="dialog" aria-labelledby="editClientModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Client</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="clientAjaxForm">
+                <input type='hidden' id='edit-clientid'>
+                <div class="form-group row">
+                    <label for="clientName" class="col-md-4 col-form-label text-md-right">{{ __('Name') }}</label>
+                    <div class="col-md-6">
+                        <input id="edit-clientName" type="text" class="form-control" name="clientName">
+                        <span class="invalid-feedback clientName" role="alert"></span>
+                    </div>
+
+                </div>
+                <div class="form-group row">
+                    <label for="clientSurname" class="col-md-4 col-form-label text-md-right">{{ __('Surname') }}</label>
+
+                    <div class="col-md-6">
+                        <input id="edit-clientSurname" type="text" class="form-control" name="clientSurname">
+                        <span class="invalid-feedback clientSurname" role="alert"></span>
+                    </div>
+
+                </div>
+                <div class="form-group row">
+                    <label for="clientDescription" class="col-md-4 col-form-label text-md-right">{{ __('Description') }}</label>
+
+                    <div class="col-md-6">
+                        <textarea id="edit-clientDescription" name="clientDescription" class="summernote form-control">
+
+                        </textarea>
+                        <span class="invalid-feedback clientDescription" role="alert"></span>
+                    </div>
+
+                </div>
+                <div class="form-group row clientCompany">
+                    <label for="clientCompany" class="col-md-4 col-form-label text-md-right">{{ __('Company') }}</label>
+
+                    <div class="col-md-6">
+
+                        <select id="edit-clientCompany" class="form-control" name="clientCompany">
+                            @foreach ($companies as $company)
+                                <option value="{{$company->id}}"> {{$company->title}}</option>
+                            @endforeach
+                        </select>
+                        <span class="invalid-feedback clientCompany" role="alert"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary updateClientModal">Update</button>
+        </div>
+      </div>
+    </div>
+</div>
+
 <script>
 
     $.ajaxSetup({
@@ -199,6 +265,60 @@
 
        console.log(clientid);
     });
+
+    $(".update-client").click(function() {
+        var clientid = $(this).attr('data-clientid');
+        $("#editClientModal").modal("show");
+        $.ajax({
+                type: 'GET',
+                url: '/clients/editAjax/' + clientid ,// action
+                success: function(data) {
+                    $("#edit-clientid").val(data.clientId);
+                  $("#edit-clientName").val(data.clientName);
+                  $("#edit-clientSurname").val(data.clientSurname);
+                  $("#edit-clientDescription").val(data.clientDescription);
+                  $("#edit-clientCompany").val(data.clientCompany);
+                }
+            });
+    })
+
+    $(".updateClientModal").click(function() {
+        var clientid = $("#edit-clientid").val();
+        var clientName = $("#edit-clientName").val();
+        var clientSurname = $("#edit-clientSurname").val();
+        var clientDescription = $("#edit-clientDescription").val();
+        var clientCompany = $("#edit-clientCompany").val();
+
+        $.ajax({
+                type: 'POST',
+                url: '/clients/updateAjax/' + clientid ,
+                data: {clientName:clientName, clientSurname:clientSurname,clientDescription:clientDescription, clientCompany:clientCompany },
+                success: function(data) {
+                    if($.isEmptyObject(data.error)) {
+                        $(".invalid-feedback").css("display", 'none');
+                        $("#editClientModal").modal("hide");
+                        $(".alerts").append("<div class='alert alert-success'>"+ data.success +"</div");
+
+                    } else {
+                        $(".invalid-feedback").css("display", 'none');
+                        $.each(data.error, function(key, error){
+                            //key = laukelio pavadinimas prie kurio ivyko klaida
+                            var errorSpan = '.' + key;
+                            $(errorSpan).css('display', 'block');
+                            $(errorSpan).html('');
+                            $(errorSpan).append('<strong>'+ error + "</strong>");
+
+                        });
+                    }
+
+                }
+            });
+
+
+
+
+    })
+
  });
 
 </script>

@@ -157,7 +157,23 @@ class ClientController extends Controller
      */
     public function edit(Client $client)
     {
-        //
+        return view("client.edit", ['client'=> $client]);
+    }
+
+    //gauti informacija apie klienta i edit modal forma
+    public function editAjax(Client $client) {
+        $success = [
+            'success' => 'Client recieved successfully',
+            'clientId' => $client->id,
+            'clientName' => $client->name,
+            'clientSurname' => $client->surname,
+            'clientDescription' => $client->description,
+            'clientCompany' => $client->company_id
+        ];
+
+        $success_json = response()->json($success);
+
+        return $success_json;
     }
 
     /**
@@ -169,7 +185,56 @@ class ClientController extends Controller
      */
     public function update(Request $request, Client $client)
     {
-        //
+
+
+    }
+
+    //kuri atnaujintus duomenis patalpis i duomenu baze
+    public function updateAjax(Request $request, Client $client) {
+        $input = [
+            'clientName' => $request->clientName,
+            'clientSurname' => $request->clientSurname,
+            'clientDescription' => $request->clientDescription,
+            'clientCompany' => $request->clientCompany
+        ];//ka mes ivedama, laukeliu pavadinimai kuriuos validuosim
+        $rules = [
+            'clientName' => 'required|min:3',
+            'clientSurname' => 'required|min:3',
+            'clientDescription' => 'min:15',
+            'clientCompany' => 'numeric'
+        ]; //taisykles
+
+        $validator = Validator::make($input, $rules);
+
+        if($validator->passes()) {
+            $client->name = $request->clientName;
+            $client->surname = $request->clientSurname;
+            $client->description = $request->clientDescription;
+            $client->company_id = $request->clientCompany;
+
+            $client->save();
+
+            $success = [
+                'success' => 'Client update successfully',
+                'clientId' => $client->id,
+                'clientName' => $client->name,
+                'clientSurname' => $client->surname,
+                'clientDescription' => $client->description,
+                'clientCompany' => $client->clientCompany->title
+            ];
+
+            $success_json = response()->json($success);
+
+            return $success_json;
+        }
+
+        $errors = [
+            'error' => $validator->messages()->get('*')
+        ];
+
+        $errors_json = response()->json($errors);
+
+        return $errors_json;
     }
 
     /**

@@ -28,7 +28,11 @@ Route::prefix('clients')->group(function () {
     Route::post('store', 'ClientController@store')->name('client.store');
     Route::post('storeAjax', 'ClientController@storeAjax')->name('client.storeAjax');
     Route::get('edit/{client}', 'ClientController@edit')->name('client.edit');
+    Route::get('editAjax/{client}', 'ClientController@editAjax')->name('client.editAjax');
     Route::post('update/{client}', 'ClientController@update')->name('client.update');
+
+    Route::post('updateAjax/{client}', 'ClientController@updateAjax')->name('client.updateAjax');
+
     Route::post('delete/{client}', 'ClientController@destroy' )->name('client.destroy');
     Route::post('deleteAjax/{client}', 'ClientController@destroyAjax' )->name('client.destroyAjax');
     Route::get('show/{client}', 'ClientController@show')->name('client.show');
