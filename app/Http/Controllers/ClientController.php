@@ -276,4 +276,54 @@ class ClientController extends Controller
 
         return $success_json;
     }
+
+    public function searchAjax(Request $request) {
+        //Jos pasiima kintamuosius is ajax($request)
+        //Atliekami tam tikri veiksmai
+        //Ir grazinamas sekmes/nesekmes masyvas
+
+        //reikia pasiimti informacija is request - search field.
+        // Visus klientus pagal search field: name, surname, aprasyma, pagal visus
+        //sekmes atveju - rezultatu lentele
+        //nesekmes atveju - na, rezultatu nera
+
+
+        //pagal sugalvota paieskos zodi, gauti visus klientus
+        $searchValue = $request->searchField;
+
+        //
+        // $clients = Client::all();
+
+        $clients = Client::query()
+            ->where('name', 'like', "%{$searchValue}%")
+            ->orWhere('surname', 'like', "%{$searchValue}%")
+            ->orWhere('description', 'like', "%{$searchValue}%")
+            ->get();
+
+        //$clients kintamasis yra tuscias, vadinasi as galiu formuoti nesekmes zinute: na, rezultatu nera
+        //jei searchValue yra tuscias, yra grazinami rezultatai
+
+        //sekmes zinute
+        if($searchValue == '' || count($clients)!= 0) {
+
+            $success = [
+                'success' => 'Found '.count($clients),
+                'clients' => $clients
+            ];
+
+            $success_json = response()->json($success);
+
+
+            return $success_json; //yra musu sekmes pranesimas
+        }
+
+        $error = [
+            'error' => 'No results are found'
+        ];
+
+        $errors_json = response()->json($error);
+
+        return $errors_json;
+
+    }
 }

@@ -8,19 +8,34 @@
 
 3. Show funkcionalumas isokanciame lange x
 --}}
+
+{{-- Paieska --}}
 <div class="container">
+
+    <div class="search-form row">
+        <div class="col-md-8">
+            <button class="test-delete" type="button">Test delete</button>
+            {{-- data-target =  --}}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createClientModal">
+                Create New Client Modal
+            </button>
+
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#showClientModal">
+                Show Client Modal
+            </button>
+        </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="search-field" name="search-field"/>
+            <button type="button" class="btn btn-primary" id="search-button" >Search</button>
+        </div>
+    </div>
 
 <div class="alerts">
 </div>
-    <button class="test-delete" type="button">Test delete</button>
-    {{-- data-target =  --}}
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createClientModal">
-        Create New Client Modal
-    </button>
 
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#showClientModal">
-        Show Client Modal
-    </button>
+<div class="search-alert">
+</div>
+
 <table class="clients table table-striped">
     <tr>
         <th>ID</th>
@@ -46,6 +61,8 @@
         </tr>
     @endforeach
 </table>
+
+
 </div>
 <div class="modal fade" id="createClientModal" tabindex="-1" role="dialog" aria-labelledby="createClientModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -353,6 +370,60 @@
         // $(".client8").remove();
         $(".rowClient3 .colClientName").html("pakeistas per javascript");
         $(".rowClient3 .colClientSurname").html("pakeistas per javascript pavarde");
+    })
+
+    // $("#search-button").click(function() {
+
+      // kad paeiska pradetu veikti tik kai ivedem 3 simbolius
+      // riboti uzklausu kieki 
+      $(document).on('input', '#search-field', function() {
+        //yra sekama kas ivedama i input
+        var searchField = $("#search-field").val();
+
+        $.ajax({
+                type: 'GET',
+                url: '/clients/searchAjax/',
+                data: {searchField: searchField },
+                success: function(data) {
+                    if($.isEmptyObject(data.error)) {
+                        console.log(data.success);
+                        $(".clients").css("display", "block");
+
+                        $(".search-alert").html("");
+                        $(".search-alert").html(data.success);
+
+                        $(".clients tbody").html("");
+                        $(".clients tbody").append("<tr><th>ID</th><th>Name</th><th>Surname</th><th>Description</th><th>Company</th><th>Actions</th></tr>");
+                        $.each(data.clients, function(key, client){
+                            //key = laukelio pavadinimas prie kurio ivyko klaida
+                            // $(".ajaxClients").append("<tr><td>"+client.id+"</td><td>" + client.name +"</td></tr>");
+
+                            var clientRow = "<tr class='rowClient"+ client.id +"'>";
+                            clientRow += "<td class='colClientId'>"+ client.id +"</td>";
+                            clientRow += "<td class='colClientName'>"+ client.name +"</td>";
+                            clientRow += "<td class='colClientSurname'>"+ client.surname +"</td>";
+                            clientRow += "<td class='colClientDescription'>"+ client.description +"</td>";
+                            clientRow += "<td class='colClientCompanyTitle'>"+ client.company_id +"</td>";
+                            clientRow += "<td>";
+                            clientRow += "<button type='button' class='btn btn-success show-client' data-clientid='"+ client.id +"'>Show</button>";
+                            clientRow += "<button type='button' class='btn btn-secondary update-client' data-clientid='"+ client.id +"'>Update</button>";
+                            clientRow += "</td>";
+                            clientRow += "</tr>";
+
+                            $(".clients tbody").append(clientRow);
+                        });
+                    } else {
+
+                        $(".clients").css("display", "none");
+                        $(".clients tbody").html("");
+                        $(".search-alert").html("");
+                        $(".search-alert").append(data.error);
+                        // console.log(data.error)
+                    }
+
+                }
+            });
+        console.log(searchField);
     })
 
 
