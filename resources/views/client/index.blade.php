@@ -12,7 +12,7 @@
 
 <div class="alerts">
 </div>
-
+    <button class="test-delete" type="button">Test delete</button>
     {{-- data-target =  --}}
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createClientModal">
         Create New Client Modal
@@ -32,12 +32,12 @@
     </tr>
 
     @foreach ($clients as $client)
-        <tr>
-            <td>{{$client->id}}</td>
-            <td>{{$client->name}}</td>
-            <td>{{$client->surname}}</td>
-            <td>{{$client->description}}</td>
-            <td>{{$client->clientCompany->title}}</td>
+        <tr class="rowClient{{$client->id}}">
+            <td class="colClientId">{{$client->id}}</td>
+            <td class="colClientName">{{$client->name}}</td>
+            <td class="colClientSurname">{{$client->surname}}</td>
+            <td class="colClientDescription">{{$client->description}}</td>
+            <td class="colClientCompanyTitle">{{$client->clientCompany->title}}</td>
             <td>
                 <button type="button" class="btn btn-success show-client" data-clientid='{{$client->id}}'>Show</button>
                 <button type="button" class="btn btn-secondary update-client" data-clientid='{{$client->id}}'>Update</button>
@@ -218,7 +218,8 @@
                     if($.isEmptyObject(data.error)) {
                         $(".invalid-feedback").css("display", 'none');
                         $("#createClientModal").modal("hide");
-                        $(".clients").append("<tr><td>"+ data.clientId +"</td><td>"+ data.clientName +"</td><td>"+ data.clientSurname +"</td><td>"+ data.clientDescription +"</td><td>"+ data.clientCompany +"</td><td>Actions</td></tr>");
+                        $(".clients").append("<tr class='rowClient"+ data.clientId +"'><td class='colClientId'>"+ data.clientId +"</td><td class='colClientName'>"+ data.clientName +"</td><td class='colClientSurname'>"+ data.clientSurname +"</td><td class='colClientDescription'>"+ data.clientDescription +"</td><td class='colClientCompanyTitle'>"+ data.clientCompany +"</td><td><button type='button' class='btn btn-success show-client' data-clientid='"+ data.clientId +"'>Show</button><button type='button' class='btn btn-secondary update-client' data-clientid='"+ data.clientId +"'>Update</button></td></tr>");
+
                         $(".alerts").append("<div class='alert alert-success'>"+ data.success +"</div");
 
                         $("#clientName").val('');
@@ -242,7 +243,10 @@
 
     });
 
-    $(".show-client").click(function() {
+
+    //click jinai neseka dinamiskai per javascript sukurtu elementu
+    // $(".show-client").click(function() {
+       $(document).on('click', '.show-client', function() {
 
        $('#showClientModal').modal('show');
        var clientid = $(this).attr("data-clientid");
@@ -266,7 +270,9 @@
        console.log(clientid);
     });
 
-    $(".update-client").click(function() {
+    // $(".update-client").click(function() {
+        $(document).on('click', '.update-client', function() {
+
         var clientid = $(this).attr('data-clientid');
         $("#editClientModal").modal("show");
         $.ajax({
@@ -299,6 +305,12 @@
                         $("#editClientModal").modal("hide");
                         $(".alerts").append("<div class='alert alert-success'>"+ data.success +"</div");
 
+
+                        $(".rowClient"+ clientid + " .colClientName").html(data.clientName);
+                        $(".rowClient"+ clientid + " .colClientSurname").html(data.clientSurname);
+                        $(".rowClient"+ clientid + " .colClientDescription").html(data.clientDescription);
+                        $(".rowClient"+ clientid + " .colClientCompanyTitle").html(data.clientCompany);
+
                     } else {
                         $(".invalid-feedback").css("display", 'none');
                         $.each(data.error, function(key, error){
@@ -318,6 +330,18 @@
 
 
     })
+
+    //kazkokio mygtuko paspaudimu istrinsiu konkretu klienta is dizaino
+    //klienta kurio id yra 3
+    //kazkurio is klientu varda pakeisti i "pakeistas per javascript"
+    // pakeisti ir pavarde
+
+    $(".test-delete").click(function() {
+        // $(".client8").remove();
+        $(".rowClient3 .colClientName").html("pakeistas per javascript");
+        $(".rowClient3 .colClientSurname").html("pakeistas per javascript pavarde");
+    })
+
 
  });
 
