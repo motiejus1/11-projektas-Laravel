@@ -218,7 +218,20 @@
                     if($.isEmptyObject(data.error)) {
                         $(".invalid-feedback").css("display", 'none');
                         $("#createClientModal").modal("hide");
-                        $(".clients").append("<tr class='rowClient"+ data.clientId +"'><td class='colClientId'>"+ data.clientId +"</td><td class='colClientName'>"+ data.clientName +"</td><td class='colClientSurname'>"+ data.clientSurname +"</td><td class='colClientDescription'>"+ data.clientDescription +"</td><td class='colClientCompanyTitle'>"+ data.clientCompany +"</td><td><button type='button' class='btn btn-success show-client' data-clientid='"+ data.clientId +"'>Show</button><button type='button' class='btn btn-secondary update-client' data-clientid='"+ data.clientId +"'>Update</button></td></tr>");
+
+                        var clientRow = "<tr class='rowClient"+ data.clientId +"'>";
+                            clientRow += "<td class='colClientId'>"+ data.clientId +"</td>";
+                            clientRow += "<td class='colClientName'>"+ data.clientName +"</td>";
+                            clientRow += "<td class='colClientSurname'>"+ data.clientSurname +"</td>";
+                            clientRow += "<td class='colClientDescription'>"+ data.clientDescription +"</td>";
+                            clientRow += "<td class='colClientCompanyTitle'>"+ data.clientCompany +"</td>";
+                            clientRow += "<td>";
+                            clientRow += "<button type='button' class='btn btn-success show-client' data-clientid='"+ data.clientId +"'>Show</button>";
+                            clientRow += "<button type='button' class='btn btn-secondary update-client' data-clientid='"+ data.clientId +"'>Update</button>";
+                            clientRow += "</td>";
+                            clientRow += "</tr>";
+
+                        $(".clients").append(clientRow);
 
                         $(".alerts").append("<div class='alert alert-success'>"+ data.success +"</div");
 
