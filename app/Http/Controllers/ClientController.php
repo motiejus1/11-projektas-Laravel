@@ -16,7 +16,16 @@ class ClientController extends Controller
      */
     public function index()
     {
+        // $clients = Client::all();
+
+        //pagal company_id
+
         $clients = Client::all();
+
+        //isfiltruoti irasus kurie priklauso 2 kompanijai, ir surikiuoti juos pagal id mazejancia tvarka
+        // $clients = Client::where('company_id',2)->orderBy('id', 'DESC')
+
+
         $companies = Company::all();
         return view('client.index',['clients'=> $clients, 'companies'=> $companies]);
     }
@@ -344,6 +353,99 @@ class ClientController extends Controller
         $errors_json = response()->json($error);
 
         return $errors_json;
+
+    }
+
+    public function indexAjax(Request $request) {
+
+
+        //Siuos kintamuosius paimti is request
+        //Rikiavimo stulpelis
+        $sortCol = $request->sortCol;
+        //Rikiavimo tvarka
+        $sortOrder = $request->sortOrder;
+
+        $company_id = $request->company_id;
+
+        if($company_id == 'all') {
+            $clients = Client::orderBy($sortCol, $sortOrder)->get();
+        } else {
+            $clients = Client::where('company_id', $company_id)->orderBy($sortCol, $sortOrder)->get();
+        }
+
+
+        foreach ($clients as $client) {
+            $client['companyTitle'] = $client->clientCompany->title;
+        }
+        //sekmes - visas isrikiuotas klientu masyvas
+        //nesekmes - nesekmes zinute
+
+        $clients_count = count($clients);
+
+        // $clients_count = 0;
+
+        if ($clients_count == 0) {
+            $error = [
+                'error' => 'There are no clients',
+            ];
+
+            $error_json = response()->json($error);
+            return $error_json;
+        }
+
+
+        $success = [
+            'success' => 'Clients sorted successfuly',
+            'clients' => $clients
+        ];
+
+        $success_json = response()->json($success);
+
+        return $success_json;
+
+    }
+
+    public function filterAjax(Request $request) {
+        //reikia klientus pagal kazkoki tai filtravimo kintamaji
+        //ji gauti per request
+        //formuoti sekmes ir nesekmes atvejus
+
+        //kompanijos id arba zodelis all
+
+        // $company_id = 3;
+        $company_id = $request->company_id;
+
+        if($company_id == 'all') {
+            $clients = Client::all();
+        } else {
+            $clients = Client::all()->where('company_id', $company_id);
+        }
+
+        foreach ($clients as $client) {
+            $client['companyTitle'] = $client->clientCompany->title;
+        }
+
+        $clients_count = count($clients);
+
+        if ($clients_count == 0) {
+            $error = [
+                'error' => 'There are no clients',
+            ];
+
+            $error_json = response()->json($error);
+            return $error_json;
+        }
+
+        $success = [
+            'success' => 'Clients filtered successfuly',
+            'clients' => $clients
+        ];
+
+        $success_json = response()->json($success);
+
+        return $success_json;
+
+
 
     }
 }
