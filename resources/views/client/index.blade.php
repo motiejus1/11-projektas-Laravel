@@ -27,6 +27,8 @@
         <div class="col-md-4">
             <input type="text" class="form-control" id="search-field" name="search-field"/>
             <button type="button" class="btn btn-primary" id="search-button" >Search</button>
+            <span class="search-feedback">
+            </span>
         </div>
     </div>
 
@@ -375,10 +377,18 @@
     // $("#search-button").click(function() {
 
       // kad paeiska pradetu veikti tik kai ivedem 3 simbolius
-      // riboti uzklausu kieki 
+      // riboti uzklausu kieki
       $(document).on('input', '#search-field', function() {
         //yra sekama kas ivedama i input
         var searchField = $("#search-field").val();
+        var searchFieldCount = searchField.length;
+
+        if(searchFieldCount != 0 && searchFieldCount < 3) {
+            $(".search-feedback").css('display', 'block');
+            $(".search-feedback").html("Min 3 symbols");
+        } else {
+            $(".search-feedback").css('display', 'none');
+
 
         $.ajax({
                 type: 'GET',
@@ -403,7 +413,7 @@
                             clientRow += "<td class='colClientName'>"+ client.name +"</td>";
                             clientRow += "<td class='colClientSurname'>"+ client.surname +"</td>";
                             clientRow += "<td class='colClientDescription'>"+ client.description +"</td>";
-                            clientRow += "<td class='colClientCompanyTitle'>"+ client.company_id +"</td>";
+                            clientRow += "<td class='colClientCompanyTitle'>"+ client.companyTitle +"</td>";
                             clientRow += "<td>";
                             clientRow += "<button type='button' class='btn btn-success show-client' data-clientid='"+ client.id +"'>Show</button>";
                             clientRow += "<button type='button' class='btn btn-secondary update-client' data-clientid='"+ client.id +"'>Update</button>";
@@ -423,7 +433,8 @@
 
                 }
             });
-        console.log(searchField);
+        }
+
     })
 
 

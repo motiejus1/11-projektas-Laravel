@@ -291,6 +291,8 @@ class ClientController extends Controller
         //pagal sugalvota paieskos zodi, gauti visus klientus
         $searchValue = $request->searchField;
 
+        // $searchValue = '';
+
         //
         // $clients = Client::all();
 
@@ -299,6 +301,24 @@ class ClientController extends Controller
             ->orWhere('surname', 'like', "%{$searchValue}%")
             ->orWhere('description', 'like', "%{$searchValue}%")
             ->get();
+        //eilute yra klientas, kiekvienas stulpelis yra informacija apie klienta
+
+        foreach ($clients as $client) {
+            $client['companyTitle'] = $client->clientCompany->title;
+        }
+
+        // $testArray = []; // kliento vardas
+
+
+        // $clients[] = "test";
+
+        // return $clients;
+
+        // foreach ($clients as $client) {
+            // $testArray[] = $client->surname;
+        // }
+
+        // return $testArray;
 
         //$clients kintamasis yra tuscias, vadinasi as galiu formuoti nesekmes zinute: na, rezultatu nera
         //jei searchValue yra tuscias, yra grazinami rezultatai
