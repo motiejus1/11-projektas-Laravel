@@ -16,19 +16,24 @@ class ClientController extends Controller
      */
     public function index()
     {
-        // $clients = Client::all();
 
-        //pagal company_id
-
-        $clients = Client::all();
-
-        //isfiltruoti irasus kurie priklauso 2 kompanijai, ir surikiuoti juos pagal id mazejancia tvarka
-        // $clients = Client::where('company_id',2)->orderBy('id', 'DESC')
-
+        $clients = Client::paginate(2); // 15 irasu ir atsiminti kuris tai puslapis
 
         $companies = Company::all();
         return view('client.index',['clients'=> $clients, 'companies'=> $companies]);
     }
+
+    public function indexPaginate() {
+
+        $clients = Client::paginate(2);
+
+        foreach ($clients as $client) {
+            $client['companyTitle'] = $client->clientCompany->title;
+        }
+
+        return $clients;
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -100,6 +105,11 @@ class ClientController extends Controller
 
         $validator = Validator::make($input, $rules);
 
+        $sortCol = $request->sortCol;
+        $sortOrder = $request->sortOrder;
+        $company_id = $request->company_id;
+
+
         if($validator->passes()) {
             $client->name = $request->clientName;
             $client->surname = $request->clientSurname;
@@ -108,13 +118,24 @@ class ClientController extends Controller
 
             $client->save();
 
+            if($company_id == 'all') {
+                $clients = Client::orderBy($sortCol, $sortOrder)->get();
+            } else {
+                $clients = Client::where('company_id', $company_id)->orderBy($sortCol, $sortOrder)->get();
+            }
+
+            foreach ($clients as $client) {
+                $client['companyTitle'] = $client->clientCompany->title;
+            }
+
             $success = [
                 'success' => 'Client added successfully',
-                'clientId' => $client->id,
-                'clientName' => $client->name,
-                'clientSurname' => $client->surname,
-                'clientDescription' => $client->description,
-                'clientCompany' => $client->clientCompany->title
+                // 'clientId' => $client->id,
+                // 'clientName' => $client->name,
+                // 'clientSurname' => $client->surname,
+                // 'clientDescription' => $client->description,
+                // 'clientCompany' => $client->clientCompany->title,
+                'clients' => $clients
             ];
 
             $success_json = response()->json($success);
@@ -372,7 +393,6 @@ class ClientController extends Controller
         } else {
             $clients = Client::where('company_id', $company_id)->orderBy($sortCol, $sortOrder)->get();
         }
-
 
         foreach ($clients as $client) {
             $client['companyTitle'] = $client->clientCompany->title;

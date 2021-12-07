@@ -88,6 +88,10 @@
     @endforeach
 </table>
 
+{!! $clients->links() !!}
+
+{!! $clients->appends(Request::except('page'))->render() !!}
+
 
 </div>
 <div class="modal fade" id="createClientModal" tabindex="-1" role="dialog" aria-labelledby="createClientModal" aria-hidden="true">
@@ -268,34 +272,94 @@
 
  $(document).ready(function() {
 
+
+
+    $(".pagination .page-link").click(function(event) {
+        event.preventDefault();
+        var page = $(this).html();
+
+        $.ajax({
+                type: 'GET',
+                url: '/clients/indexPaginate?page=' + page,
+                // data: {sortCol: sortCol, sortOrder: sortOrder, company_id: company_id },
+                data: {page: page},
+                success: function(data) {
+                    if($.isEmptyObject(data.error)) {
+                        createTable(data.data);
+                        // console.log(data.data);
+                    } else {
+                        console.log(data.error)
+                    }
+
+                }
+            });
+        // console.log(page);
+    });
+
+    $(".page").click(function() {
+        var page = $(this).attr('data-page');
+        console.log(page);
+
+        $.ajax({
+                type: 'GET',
+                url: '/clients/indexPaginate?page=' + page,
+                // data: {sortCol: sortCol, sortOrder: sortOrder, company_id: company_id },
+                data: {page: page},
+                success: function(data) {
+                    if($.isEmptyObject(data.error)) {
+                        createTable(data.data);
+                        // console.log(data.data);
+                    } else {
+                        console.log(data.error)
+                    }
+
+                }
+            });
+
+
+
+    });
+
     $(".addClientModal").click(function() {
+
         var clientName = $("#clientName").val();
         var clientSurname = $("#clientSurname").val();
         var clientDescription = $("#clientDescription").val();
         var clientCompany = $("#clientCompany").val();
 
+        var sortCol = $("#sortCol").val();
+        var sortOrder = $("#sortOrder").val();
+        var company_id = $("#company_id").val();
+
+        console.log(sortCol + " " + sortOrder + " " + company_id);
+        //1. turetume jau perduoti ir rikiavimo bei filtravimo kintamuosius.
+        //2. jinai tik prideda nauja klienta i duomenu baze ir frontend puses prie lenteles tiesiog prikabina irasa
+        //3. ajax uzklausa prideda nauja klienta i DB, is frontend puses lentele perbraizoma su nauju duomenimi
+        //pagal rikiavimo ir filtravimo kintamuosius
+
         $.ajax({
                 type: 'POST',
                 url: '{{route("client.storeAjax")}}',
-                data: {clientName:clientName, clientSurname:clientSurname,clientDescription:clientDescription, clientCompany:clientCompany },
+                data: {clientName:clientName, clientSurname:clientSurname,clientDescription:clientDescription, clientCompany:clientCompany,sortCol: sortCol, sortOrder: sortOrder, company_id: company_id  },
                 success: function(data) {
                     if($.isEmptyObject(data.error)) {
                         $(".invalid-feedback").css("display", 'none');
                         $("#createClientModal").modal("hide");
 
-                        var clientRow = "<tr class='rowClient"+ data.clientId +"'>";
-                            clientRow += "<td class='colClientId'>"+ data.clientId +"</td>";
-                            clientRow += "<td class='colClientName'>"+ data.clientName +"</td>";
-                            clientRow += "<td class='colClientSurname'>"+ data.clientSurname +"</td>";
-                            clientRow += "<td class='colClientDescription'>"+ data.clientDescription +"</td>";
-                            clientRow += "<td class='colClientCompanyTitle'>"+ data.clientCompany +"</td>";
-                            clientRow += "<td>";
-                            clientRow += "<button type='button' class='btn btn-success show-client' data-clientid='"+ data.clientId +"'>Show</button>";
-                            clientRow += "<button type='button' class='btn btn-secondary update-client' data-clientid='"+ data.clientId +"'>Update</button>";
-                            clientRow += "</td>";
-                            clientRow += "</tr>";
+                        // var clientRow = "<tr class='rowClient"+ data.clientId +"'>";
+                        //     clientRow += "<td class='colClientId'>"+ data.clientId +"</td>";
+                        //     clientRow += "<td class='colClientName'>"+ data.clientName +"</td>";
+                        //     clientRow += "<td class='colClientSurname'>"+ data.clientSurname +"</td>";
+                        //     clientRow += "<td class='colClientDescription'>"+ data.clientDescription +"</td>";
+                        //     clientRow += "<td class='colClientCompanyTitle'>"+ data.clientCompany +"</td>";
+                        //     clientRow += "<td>";
+                        //     clientRow += "<button type='button' class='btn btn-success show-client' data-clientid='"+ data.clientId +"'>Show</button>";
+                        //     clientRow += "<button type='button' class='btn btn-secondary update-client' data-clientid='"+ data.clientId +"'>Update</button>";
+                        //     clientRow += "</td>";
+                        //     clientRow += "</tr>";
 
-                        $(".clients").append(clientRow);
+                        // $(".clients").append(clientRow);
+                        createTable(data.clients);
 
                         $(".alerts").append("<div class='alert alert-success'>"+ data.success +"</div");
 
@@ -466,6 +530,15 @@
         var sortOrder = $("#sortOrder").val();
         var company_id = $("#company_id").val();
 
+        //javascript - tiesiog kalba
+
+        //ajax - javascripto kodo gabaliukas,tam tikra funkcija
+        //jquery - javascript biblioteka
+
+        //$("#company_id") = document.querySelector('#company_id')
+
+        var test = $("#company_id").val();
+        var test1 = document.querySelector('#company_id').value;
 
         $.ajax({
                 type: 'GET',
@@ -475,13 +548,30 @@
                     if($.isEmptyObject(data.error)) {
                         createTable(data.clients);
                     } else {
-
                         console.log(data.error)
                     }
 
                 }
             });
     });
+
+    // $('.button').click(
+    //     function() {
+    //         console.log('test');
+    //     }
+    // );
+
+    // $('.button').click(function() {
+    //     if() {
+
+    //     } else {
+
+    //     }
+
+    //     for() {
+
+    //     }
+    // });
 
     // $(document).on('click', '#filterClients', function() {
     //     var company_id = $("#company_id").val();

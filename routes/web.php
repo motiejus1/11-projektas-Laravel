@@ -40,6 +40,7 @@ Route::prefix('clients')->group(function () {
     Route::get('searchAjax', 'ClientController@searchAjax') ->name('client.searchAjax');
     Route::get('indexAjax', 'ClientController@indexAjax') ->name('client.indexAjax');
     Route::get('filterAjax', 'ClientController@filterAjax') ->name('client.filterAjax');
+    Route::get('indexPaginate', 'ClientController@indexPaginate') ->name('client.indexPaginate');
 
 
 
