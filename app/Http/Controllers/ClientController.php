@@ -17,15 +17,25 @@ class ClientController extends Controller
     public function index()
     {
 
-        $clients = Client::paginate(2); // 15 irasu ir atsiminti kuris tai puslapis
+        $clients = Client::paginate(5); // 15 irasu ir atsiminti kuris tai puslapis
 
         $companies = Company::all();
         return view('client.index',['clients'=> $clients, 'companies'=> $companies]);
     }
 
-    public function indexPaginate() {
+    public function indexPaginate(Request $request) {
 
-        $clients = Client::paginate(2);
+        $sortOrder = $request->sortOrder;
+        $sortCol = $request->sortCol;
+        $company_id = $request->company_id;
+
+        // $clients = Client::paginate(2);
+
+        if($company_id == 'all') {
+            $clients = Client::orderBy($sortCol, $sortOrder)->paginate(5);
+        } else {
+            $clients = Client::where('company_id', $company_id)->orderBy($sortCol, $sortOrder)->paginate(5);
+        }
 
         foreach ($clients as $client) {
             $client['companyTitle'] = $client->clientCompany->title;

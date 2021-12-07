@@ -88,7 +88,6 @@
     @endforeach
 </table>
 
-{!! $clients->links() !!}
 
 {!! $clients->appends(Request::except('page'))->render() !!}
 
@@ -241,6 +240,10 @@
     </div>
 </div>
 
+
+{{-- 1. Po filtravimo grizti atgal i pirma puslapi --}}
+
+{{-- 2. Po filtravimo pasilikti tame paciame puslapyje kuriame mes esam --}}
 <script>
 
     $.ajaxSetup({
@@ -273,16 +276,92 @@
  $(document).ready(function() {
 
 
+    var nextPage = 0;
+    var previousPage = 0;
+    var currentPage = 0;
+    var lastPage = 0;
 
-    $(".pagination .page-link").click(function(event) {
+    var sortCol = $("#sortCol").val();
+    var sortOrder = $("#sortOrder").val();
+    var company_id = $("#company_id").val();
+
+    $.ajax({
+            type: 'GET',
+            url: '/clients/indexPaginate?page=1',
+            // data: {sortCol: sortCol, sortOrder: sortOrder, company_id: company_id },
+            data: { sortCol: sortCol, sortOrder: sortOrder, company_id: company_id },
+            success: function(data) {
+                if($.isEmptyObject(data.error)) {
+                    currentPage = parseInt(data.current_page);
+                    lastPage = parseInt(data.last_page);
+                    nextPage = parseInt(currentPage) + 1;
+                    previousPage = parseInt(currentPage);
+                } else {
+                    console.log(data.error)
+                }
+
+            }
+    });
+
+    function createPagination() {
+        console.log(lastPage);
+        var pagination = $(".pagination");
+        pagination.html('');
+        pagination.append('<li class="page-item" aria-disabled="true" aria-label="« Previous"><span class="page-link" aria-hidden="true">‹</span></li>')
+        for (var i = 1; i<=lastPage; i++) {
+            if(i == 1) {
+                pagination.append('<li class="page-item active"><a class="page-link">'+ i + '</a></li>');
+
+            } else {
+                pagination.append('<li class="page-item"><a class="page-link">'+ i + '</a></li>');
+
+            }
+        }
+        pagination.append('<li class="page-item"><a class="page-link" href="http://127.0.0.1:8001/clients?page=2" rel="next" aria-label="Next »">›</a></li>')
+    };
+
+    //mes esame pirmame puslapyje
+    //sekantis puslapis 2, nextPage = 2
+    //previousPage = []
+
+    $(".page-item").removeClass('disabled');
+
+
+    // $(".pagination .page-link").click(function(event) {
+
+     $('.pagination').on('click', '.page-link', function(event) {
         event.preventDefault();
+
         var page = $(this).html();
+
+        if(page==">") {
+            page = parseInt(nextPage);
+            nextPage = parseInt(page) + 1;
+        } else if(page == "<") {
+            page = parseInt(previousPage);
+            previousPage = parseInt(page) - 1;
+        } else {
+            nextPage = parseInt(page) + 1;
+            previousPage = parseInt(page) - 1;
+        }
+
+        console.log(page);
+        console.log(nextPage);
+        console.log(previousPage);
+
+        $(".page-item").removeClass('active');
+
+        $(this).parents('.page-item').addClass('active');
+
+        var sortCol = $("#sortCol").val();
+        var sortOrder = $("#sortOrder").val();
+        var company_id = $("#company_id").val();
 
         $.ajax({
                 type: 'GET',
                 url: '/clients/indexPaginate?page=' + page,
                 // data: {sortCol: sortCol, sortOrder: sortOrder, company_id: company_id },
-                data: {page: page},
+                data: {page: page, sortCol: sortCol, sortOrder: sortOrder, company_id: company_id },
                 success: function(data) {
                     if($.isEmptyObject(data.error)) {
                         createTable(data.data);
@@ -297,14 +376,17 @@
     });
 
     $(".page").click(function() {
+
+
+
         var page = $(this).attr('data-page');
         console.log(page);
 
         $.ajax({
                 type: 'GET',
-                url: '/clients/indexPaginate?page=' + page,
+                url: '/clients/indexPaginate?page=' + page  ,
                 // data: {sortCol: sortCol, sortOrder: sortOrder, company_id: company_id },
-                data: {page: page},
+                data: {page: page, sortCol: sortCol, sortOrder: sortOrder, company_id: company_id },
                 success: function(data) {
                     if($.isEmptyObject(data.error)) {
                         createTable(data.data);
@@ -542,11 +624,19 @@
 
         $.ajax({
                 type: 'GET',
-                url: '/clients/indexAjax/',
+                // url: '/clients/indexAjax'
+                // |
+                // V
+                url: '/clients/indexPaginate?page=1',
                 data: {sortCol: sortCol, sortOrder: sortOrder, company_id: company_id },
                 success: function(data) {
                     if($.isEmptyObject(data.error)) {
-                        createTable(data.clients);
+                        //createTable(data.clients)
+                        //|
+                        //V
+                        createTable(data.data);
+                        lastPage = parseInt(data.last_page);
+                        createPagination();
                     } else {
                         console.log(data.error)
                     }
